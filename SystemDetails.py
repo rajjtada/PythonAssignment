@@ -93,10 +93,16 @@ def get_public_ip():
     if is_internet_connected():
         try:
             response = requests.get('https://httpbin.org/ip')
-            public_ip = response.json()['origin']
-            print("Public IP Address:", public_ip)
-        except Exception as e:
-            print(f"Error retrieving public IP address: {str(e)}")
+            public_ip = response.json().get('origin')
+            if public_ip:
+                print("Public IP Address:", public_ip)
+            else:
+                print("Unable to retrieve public IP address.")
+        except requests.exceptions.RequestException as e:
+            if isinstance(e, requests.exceptions.ConnectionError):
+                print("Error: Unable to connect to the external service. Check your internet connection.")
+            else:
+                print(f"Error retrieving public IP address: {str(e)}")
     else:
         print("Not connected to the internet. Unable to retrieve public IP address.")
 
